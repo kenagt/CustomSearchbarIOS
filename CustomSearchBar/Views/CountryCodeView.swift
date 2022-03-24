@@ -17,13 +17,14 @@ struct CountryCodeView: View {
     //MARK: init
     init(countryCodeViewModel: CountryCodeViewModel){
         self.countryCodeViewModel = countryCodeViewModel
+        UITextField.appearance().clearButtonMode = .whileEditing
     }
     
     //MARK: searchBar
     var searchBar: some View {
         HStack {
             Image(systemName: "magnifyingglass").foregroundColor(.gray)
-            TextField(LocalizedStringKey("search"), text: $countryName)
+            TextField("Search", text: $countryName)
                 .font(Font.system(size: 21))
         }
         .padding(7)
@@ -38,11 +39,10 @@ struct CountryCodeView: View {
                 LazyVStack(pinnedViews:[.sectionHeaders]) {
                     ForEach(countryCodeViewModel.sections.filter{ self.searchForSection($0)}, id: \.self) { letter in
                         Section(header: CountrySectionHeaderView(text: letter).frame(width: nil, height: 35, alignment: .leading)) {
-                            ForEach(countryCodeViewModel.countryCodes.filter{ self.searchForCountry($0.name!)} ) { countryModel in
+                            ForEach(countryCodeViewModel.countryCodes.filter{ (countryModel) -> Bool in countryModel.name.prefix(1) == letter && self.searchForCountry(countryModel.name) }) { countryModel in
                                 CountryItemView(countryModel: countryModel, selected: (countryModel.code == countryCodeViewModel.code) ? true : false)
                                     .contentShape(Rectangle())
                                     .onTapGesture {
-                                        print("TZAP!!!!!")
                                         selectCountryCode(selectedCountry: countryModel)
                                     }
                             }
@@ -52,7 +52,6 @@ struct CountryCodeView: View {
                 .onChange(of: scrollTarget) { target in
                     if let target = target {
                         scrollTarget = nil
-
                         withAnimation {
                             scrollProxy.scrollTo(target, anchor: .topLeading)
                         }
@@ -62,14 +61,6 @@ struct CountryCodeView: View {
         }
     }
     
-    private func searchForCountry(_ txt: String) -> Bool {
-        return (txt.lowercased(with: .current).hasPrefix(countryName.lowercased(with: .current)) || countryName.isEmpty)
-    }
-    
-    private func searchForSection(_ txt: String) -> Bool {
-        return (txt.prefix(1).lowercased(with: .current).hasPrefix(countryName.prefix(1).lowercased(with: .current)) || countryName.isEmpty)
-    }
-    
     //MARK: lettersListView
     var lettersListView: some View {
         VStack {
@@ -77,7 +68,7 @@ struct CountryCodeView: View {
                 HStack {
                     Spacer()
                     Button(action: {
-                        if countryCodeViewModel.countryCodes.first(where: { $0.name!.prefix(1) == letter }) != nil {
+                        if countryCodeViewModel.countryCodes.first(where: { $0.name.prefix(1) == letter }) != nil {
                             withAnimation {
                                 scrollTarget = letter
                             }
@@ -93,11 +84,20 @@ struct CountryCodeView: View {
         }
     }
     
+    //MARK: functions
+    private func searchForCountry(_ txt: String) -> Bool {
+        return (txt.lowercased(with: .current).hasPrefix(countryName.lowercased(with: .current)) || countryName.isEmpty)
+    }
+    
+    private func searchForSection(_ txt: String) -> Bool {
+        return (txt.prefix(1).lowercased(with: .current).hasPrefix(countryName.prefix(1).lowercased(with: .current)) || countryName.isEmpty)
+    }
+    
     //MARK: selectCountryCode
     func selectCountryCode(selectedCountry: CountryModel){
-        countryCodeViewModel.countryCodeNumber = selectedCountry.dial_code ?? ""
-        countryCodeViewModel.country = selectedCountry.name ?? ""
-        countryCodeViewModel.code = selectedCountry.code ?? ""
+        countryCodeViewModel.countryCodeNumber = selectedCountry.dial_code
+        countryCodeViewModel.country = selectedCountry.name
+        countryCodeViewModel.code = selectedCountry.code
     }
     
     //MARK: body
@@ -115,7 +115,6 @@ struct CountryCodeView: View {
             }
         }
         .navigationBarBackButtonHidden(true)
-        .navigationBarTitle(LocalizedStringKey("choose.country"), displayMode: .inline)
     }
 }
 

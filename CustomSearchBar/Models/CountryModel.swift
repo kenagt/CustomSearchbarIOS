@@ -9,10 +9,9 @@ import Foundation
 
 struct CountryModel: Codable, Identifiable {
     var id = UUID()
-    var name: String?
-    var dial_code: String?
-    var code: String?
-    var selected: Bool = false
+    var name: String
+    var dial_code: String
+    var code: String
     
     init(name: String, dial_code: String, code: String){
         self.name = name

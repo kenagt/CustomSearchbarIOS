@@ -32,9 +32,5 @@ class CountryCodeViewModel: ObservableObject {
         catch {
           print (error)
         }
-        
-        country = countryCodes.filter { $0.code == countryCodeNumber }.first?.name ?? ""
-        code = countryCodes.filter { $0.code == countryCodeNumber }.first?.code ?? ""
-        countryCodeNumber = countryCodes.filter { $0.code == countryCodeNumber }.first?.dial_code ?? ""
     }
 }

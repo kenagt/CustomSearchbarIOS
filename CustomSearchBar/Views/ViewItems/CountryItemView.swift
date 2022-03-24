@@ -23,7 +23,7 @@ struct CountryItemView: View {
     var body: some View {
         VStack {
             HStack {
-                Text("\(countryModel.name!)\("(")\(countryModel.dial_code!)\(")")")
+                Text("\(countryModel.name)\("(")\(countryModel.dial_code)\(")")")
                     .font(Font.system(size: 20))
                     .foregroundColor(Color.textColorPrimary)
                     .fontWeight(.light)
